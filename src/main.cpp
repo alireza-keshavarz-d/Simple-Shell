@@ -1,6 +1,11 @@
+#include <algorithm>
 #include <iostream>
 #include <ranges>
 #include <string>
+#include <string_view>
+#include <vector>
+
+std::vector<std::string_view> builtin_commands = {"echo", "type", "exit"};
 
 int main() {
   // Flush after every std::cout / std:cerr
@@ -38,6 +43,13 @@ int main() {
         std::cout << *it << " ";
       }
       std::cout << std::endl;
+    } else if (cmd == "type") {
+      if (std::find(builtin_commands.begin(), builtin_commands.end(), *++it) !=
+          builtin_commands.end()) {
+        std::cout << *it << " is a shell builtin\n";
+      } else {
+        std::cout << *it << ": not found\n";
+      }
     } else {
       std::cout << cmd << ": command not found\n";
     }
