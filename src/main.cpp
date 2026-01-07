@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ranges>
 #include <string>
 
 int main() {
@@ -9,13 +10,37 @@ int main() {
   while (true) {
     std::cout << "$ ";
 
-    auto command = std::string{};
-    std::getline(std::cin, command);
+    std::string line;
+    std::getline(std::cin, line);
 
-    if (command == "exit")
+    auto tokens = std::string_view{line} | std::ranges::views::split(' ') |
+                  std::ranges::views::transform([](auto &&subrange) {
+                    return std::string_view{subrange.begin(), subrange.end()};
+                  });
+
+    auto it = tokens.begin();
+    if (it == tokens.end())
+      continue;
+
+    auto cmd = *it;
+    if (cmd.empty()) {
+      do {
+        ++it;
+        if (it == tokens.end())
+          continue;
+      } while ((cmd = *it).empty());
+    }
+
+    if (cmd == "exit")
       break;
-
-    std::cout << command << ": command not found\n";
+    else if (cmd == "echo") {
+      for (++it; it != tokens.end(); ++it) {
+        std::cout << *it << " ";
+      }
+      std::cout << std::endl;
+    } else {
+      std::cout << cmd << ": command not found\n";
+    }
   }
 
   return 0;
