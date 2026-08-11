@@ -1,16 +1,45 @@
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iostream>
+#include <map>
 #include <ranges>
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
 
-std::vector<std::string_view> builtin_commands = {"echo", "type", "exit"};
+using CommandFunction =
+    std::function<void(const std::vector<std::string_view> &)>;
+
+std::set<std::string_view> builtin_commands = {"echo", "type", "exit"};
 
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
+
+  std::map<std::string_view, CommandFunction> commands = {
+      {"exit", [&](const auto &args) { std::exit(0); }},
+      {"echo",
+       [&](const auto &args) {
+         for (size_t i = 0; i < args.size(); ++i) {
+           std::cout << args[i] << " ";
+         }
+         std::cout << std::endl;
+       }},
+      {
+          "type",
+          [&](const auto &args) {
+            if (args.size() != 2)
+              return;
+            if (builtin_commands.contains(args[1])) {
+              std::cout << args[1] << " is a shell builtin\n";
+            } else {
+              std::cout << args[1] << ": not found\n";
+            }
+          },
+      }};
 
   while (true) {
     std::cout << "$ ";
