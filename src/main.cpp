@@ -38,31 +38,25 @@ int main() {
                       });
 
         auto       it  = tokens.begin();
-        const auto cmd = sv{*it++};
+        if (it == tokens.end()) continue;
+        auto cmd = sv{*it++};
+
+        if (cmd.empty()) {
+            do {
+                ++it;
+                if (it == tokens.end())
+                    continue;
+            } while ((cmd = sv{*it}).empty());
+        }
 
         auto args = std::ranges::to<std::vector<sv>>(std::ranges::subrange(it, tokens.end()));
 
         if (!command_controller.builtin_commands().contains(cmd)) {
             std::cout << cmd << ": command not found\n";
+            continue;
         }
 
         command_controller.execute(cmd, args);
-
-        // if (cmd == "exit")
-        //     break;
-        // else if (cmd == "echo") {
-        //     for (++it; it != tokens.end(); ++it) {
-        //         std::cout << *it << " ";
-        //     }
-        //     std::cout << std::endl;
-        // } else if (cmd == "type") {
-        //     if (builtin_commands.contains(*++it)) {
-        //         std::cout << *it << " is a shell builtin\n";
-        //     } else {
-        //         std::cout << *it << ": not found\n";
-        //     }
-        // } else {
-        // }
     }
 
     return 0;
