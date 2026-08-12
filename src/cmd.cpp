@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <ranges>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include "common.h"
 #include "lexer.h"
 
@@ -24,7 +24,7 @@ void command::execute(const sv &cmd, const std::vector<sv> &args) const {
         const auto func = m_builtin_commands.at(cmd);
         func(args);
     } else if (m_exec_commands_set.contains(cmd)) {
-        auto pid = fork();
+        auto pid     = fork();
         auto command = std::string{};
         command += cmd;
 

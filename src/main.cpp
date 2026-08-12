@@ -1,13 +1,10 @@
 #include "cmd.h"
-#include "common.h"
 #include "lexer.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
-#include <map>
 #include <ranges>
 #include <set>
 #include <string>
@@ -34,11 +31,13 @@ int main() {
         auto tokens = sv{line} | std::views::split(' ') |
                       std::views::filter([](auto &&subrange) { return !subrange.empty(); }) |
                       std::views::transform([](auto &&subrange) {
-                          return sv{&*subrange.begin(), static_cast<std::size_t>(std::ranges::distance(subrange))};
+                          return sv{&*subrange.begin(),
+                                    static_cast<std::size_t>(std::ranges::distance(subrange))};
                       });
 
-        auto       it  = tokens.begin();
-        if (it == tokens.end()) continue;
+        auto it = tokens.begin();
+        if (it == tokens.end())
+            continue;
         auto cmd = sv{*it++};
 
         if (cmd.empty()) {

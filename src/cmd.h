@@ -26,14 +26,14 @@ public:
 
 private:
     [[nodiscard]] std::vector<sv>                 parse_path_entries() const;
-    [[nodiscard]] std::map<std::string, fs::path>          parse_execs_in_path() const;
+    [[nodiscard]] std::map<std::string, fs::path> parse_execs_in_path() const;
 
     const std::string_view          m_PATH = std::getenv("PATH");
     std::vector<sv>                 m_paths;
     std::map<std::string, fs::path> m_path_execs; // exec : path
     std::set<sv>                    m_exec_commands_set;
 
-    std::set<sv>                           m_builtin_commands_set = {"exit", "echo", "type"};
+    std::set<sv>                  m_builtin_commands_set = {"exit", "echo", "type"};
     std::map<sv, CommandFunction> m_builtin_commands{
         {"exit", [&](const auto &args) { std::exit(0); }},
         {"echo",
@@ -51,7 +51,8 @@ private:
                 if (m_builtin_commands_set.contains(args[0])) {
                     std::cout << args[0] << " is a shell builtin\n";
                 } else if (m_path_execs.contains(std::string{args[0]})) {
-                    std::cout << args[0] << " is " << m_path_execs[std::string{args[0]}].c_str() << "\n";
+                    std::cout << args[0] << " is " << m_path_execs[std::string{args[0]}].c_str()
+                              << "\n";
                 } else {
                     std::cout << args[0] << ": not found\n";
                 }
