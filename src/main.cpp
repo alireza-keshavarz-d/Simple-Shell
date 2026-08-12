@@ -51,7 +51,8 @@ int main() {
 
         auto args = std::ranges::to<std::vector<sv>>(std::ranges::subrange(it, tokens.end()));
 
-        if (!command_controller.builtin_commands().contains(cmd)) {
+        if (!command_controller.builtin_commands().contains(cmd) &&
+            !command_controller.exec_commands().contains(cmd)) {
             std::cout << cmd << ": command not found\n";
             continue;
         }
