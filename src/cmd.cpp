@@ -6,29 +6,51 @@
 #include "process_executor.h"
 
 
-command::command() {
+Command::Command() {
     m_paths      = parse_path_entries();
     m_path_execs = parse_execs_in_path();
 
-    for (const auto &exec : m_path_execs | std::views::keys) {
-        m_exec_commands_set.insert(exec);
-    }
 }
-std::set<sv> command::builtin_commands() const { return m_builtin_commands_set; }
-std::set<sv> command::exec_commands() const { return m_exec_commands_set; }
 
-void command::execute(const sv &cmd, const std::vector<sv> &args) const {
-    if (m_builtin_commands_set.contains(cmd)) {
-        const auto func = m_builtin_commands.at(cmd);
+command Command::resolve(const sv cmd) const {
+    if (const auto it = m_builtin_commands.find(std::string{cmd}); it != m_builtin_commands.end()) {
+        return {
+            .type =  command_type::Builtin,
+            .name = cmd,
+            .path = std::nullopt,
+        };
+    }
+
+
+    if (const auto it = m_path_execs.find(std::string{cmd}); it != m_path_execs.end()) {
+        return {
+            .type =  command_type::External,
+            .name = cmd,
+            .path = it->second,
+        };
+    }
+
+    return {
+        .type  = command_type::NotFound,
+        .name = cmd,
+        .path = std::nullopt,
+    };
+}
+
+void Command::execute(const command &cmd, const std::vector<sv> &args) const {
+    if (cmd.type == command_type::Builtin) {
+        const auto func = m_builtin_commands.at(cmd.name);
         func(args);
-    } else if (m_exec_commands_set.contains(cmd)) {
-        const ProcessExecutor executor;
+        return;
+    }
 
-        executor.execute(m_path_execs.at(std::string{cmd}), cmd, args);
+    if (cmd.type == command_type::External) {
+        const ProcessExecutor executor;
+        executor.execute(*cmd.path, cmd.name, args);
     }
 }
 
-std::vector<sv> command::parse_path_entries() const {
+std::vector<sv> Command::parse_path_entries() const {
     const auto lexer = Lexer{};
 #if defined(__WIN32__)
     return lexer.lex(m_PATH, ';');
@@ -37,7 +59,7 @@ std::vector<sv> command::parse_path_entries() const {
 #endif
 }
 
-std::map<std::string, fs::path> command::parse_execs_in_path() const {
+std::map<std::string, fs::path> Command::parse_execs_in_path() const {
     std::map<std::string, fs::path> map;
 
     for (auto const &entry : m_paths) {

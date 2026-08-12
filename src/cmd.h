@@ -10,19 +10,19 @@
 #include <vector>
 
 #include "common.h"
+#include "command_resolver.h"
 
 using sv     = std::string_view;
 namespace fs = std::filesystem;
 
 
-class command {
+class Command {
 public:
-    explicit command();
+    explicit Command();
 
-    [[nodiscard]] std::set<sv> builtin_commands() const;
-    [[nodiscard]] std::set<sv> exec_commands() const;
+    [[nodiscard]] command resolve(sv cmd) const;
 
-    void execute(const sv &cmd, const std::vector<sv> &args) const;
+    void execute(const command &cmd, const std::vector<sv> &args) const;
 
 private:
     [[nodiscard]] std::vector<sv>                 parse_path_entries() const;
@@ -31,9 +31,7 @@ private:
     const std::string_view          m_PATH = std::getenv("PATH");
     std::vector<sv>                 m_paths;
     std::map<std::string, fs::path> m_path_execs; // exec : path
-    std::set<sv>                    m_exec_commands_set;
 
-    std::set<sv>                  m_builtin_commands_set = {"exit", "echo", "type"};
     std::map<sv, CommandFunction> m_builtin_commands{
         {"exit", [&](const auto &args) { std::exit(0); }},
         {"echo",
@@ -48,7 +46,9 @@ private:
             [&](const std::vector<sv> &args) {
                 if (args.empty())
                     return;
-                if (m_builtin_commands_set.contains(args[0])) {
+                if (const auto it = m_builtin_commands.find(std::string{args[0]});
+                    it != m_builtin_commands.end()
+                ) {
                     std::cout << args[0] << " is a shell builtin\n";
                 } else if (m_path_execs.contains(std::string{args[0]})) {
                     std::cout << args[0] << " is " << m_path_execs[std::string{args[0]}].c_str()
