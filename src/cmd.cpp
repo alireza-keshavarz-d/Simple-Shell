@@ -29,10 +29,11 @@ void command::execute(const sv &cmd, const std::vector<sv> &args) const {
 }
 
 std::vector<sv> command::parse_path_entries() const {
+    const auto lexer = Lexer{};
 #if defined(__WIN32__)
-    return split(m_PATH, ';');
+    return lexer.lex(m_PATH, ';');
 #elif defined(__linux)
-    return split(m_PATH, ':');
+    return lexer.lex(m_PATH, ':');
 #endif
 }
 

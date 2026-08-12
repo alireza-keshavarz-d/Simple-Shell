@@ -4,12 +4,21 @@
 #include <string_view>
 #include <vector>
 
-std::vector<std::string_view> split(const std::string_view &line, char delimiter) {
-    std::vector<std::string_view> result;
-    for (auto subrange : line | std::views::split(delimiter)) {
-        result.emplace_back(subrange);
-    }
-    return result;
-}
 
-auto lex(const std::string_view &line) { return split(line, ' '); }
+std::vector<sv> Lexer::lex(std::string_view input, char delimiter) const {
+    auto tokens =
+        input
+        | std::views::split(delimiter)
+        | std::views::filter([](auto&& subrange) {
+            return !subrange.empty();
+        })
+        | std::views::transform([](auto&& subrange) {
+            return sv{
+                &*subrange.begin(),
+                static_cast<std::size_t>(
+                    std::ranges::distance(subrange))
+            };
+        });
+
+    return std::ranges::to<std::vector<sv>>(tokens);
+}

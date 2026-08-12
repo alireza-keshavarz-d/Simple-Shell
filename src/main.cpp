@@ -21,6 +21,7 @@ int main() {
     std::cerr << std::unitbuf;
 
     const auto command_controller = command{};
+    const auto lexer = Lexer{};
 
     while (true) {
         std::cout << "$ ";
@@ -28,27 +29,14 @@ int main() {
         std::string line;
         std::getline(std::cin, line);
 
-        auto tokens = sv{line} | std::views::split(' ') |
-                      std::views::filter([](auto &&subrange) { return !subrange.empty(); }) |
-                      std::views::transform([](auto &&subrange) {
-                          return sv{&*subrange.begin(),
-                                    static_cast<std::size_t>(std::ranges::distance(subrange))};
-                      });
+        const auto tokens = lexer.lex(line, ' ');
 
-        auto it = tokens.begin();
-        if (it == tokens.end())
-            continue;
-        auto cmd = sv{*it++};
+        if (tokens.empty()) continue;
 
-        if (cmd.empty()) {
-            do {
-                ++it;
-                if (it == tokens.end())
-                    continue;
-            } while ((cmd = sv{*it}).empty());
-        }
+        const auto cmd = tokens.front();
 
-        auto args = std::ranges::to<std::vector<sv>>(std::ranges::subrange(it, tokens.end()));
+        const auto args =
+            std::vector<sv>{tokens.begin() + 1, tokens.end()};
 
         if (!command_controller.builtin_commands().contains(cmd) &&
             !command_controller.exec_commands().contains(cmd)) {
@@ -58,6 +46,4 @@ int main() {
 
         command_controller.execute(cmd, args);
     }
-
-    return 0;
 }

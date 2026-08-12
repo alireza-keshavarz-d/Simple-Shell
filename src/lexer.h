@@ -1,8 +1,18 @@
-#pragma once
+//
+// Created by ka on 8/13/25.
+//
+
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <string_view>
 #include <vector>
 
-std::vector<std::string_view> split(const std::string_view &line, char delimiter);
+using sv = std::string_view;
 
-auto lex(const std::string_view &line);
+class Lexer {
+public:
+    [[nodiscard]] std::vector<sv> lex(std::string_view input, char delimiter) const;
+};
+
+#endif // LEXER_H
