@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include <ranges>
-
+#include <unistd.h>
+#include <sys/wait.h>
 #include "common.h"
 #include "lexer.h"
 
@@ -19,8 +20,27 @@ std::set<sv> command::builtin_commands() const { return m_builtin_commands_set; 
 std::set<sv> command::exec_commands() const { return m_exec_commands_set; }
 
 void command::execute(const sv &cmd, const std::vector<sv> &args) const {
-    const auto func = m_builtin_commands.at(cmd);
-    func(args);
+    if (m_builtin_commands_set.contains(cmd)) {
+        const auto func = m_builtin_commands.at(cmd);
+        func(args);
+    } else if (m_exec_commands_set.contains(cmd)) {
+        auto pid = fork();
+        auto command = std::string{};
+        command += cmd;
+
+        for (auto [i, view] : std::views::enumerate(args)) {
+            command += ' ';
+            command += view;
+        }
+
+        if (pid == 0) { // child
+            std::system(command.c_str());
+        }
+        if (pid > 0) { // parent
+            int status;
+            waitpid(pid, &status, 0);
+        }
+    }
 }
 
 std::vector<sv> command::parse_path_entries() const {
