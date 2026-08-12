@@ -1,88 +1,69 @@
+#include "cmd.h"
+#include "common.h"
+#include "lexer.h"
+
 #include <algorithm>
 #include <cstddef>
-#include <functional>
+#include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
-#include <vector>
 
-using CommandFunction =
-    std::function<void(const std::vector<std::string_view> &)>;
+
+namespace fs = std::filesystem;
 
 std::set<std::string_view> builtin_commands = {"echo", "type", "exit"};
 
 int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
+    // Flush after every std::cout / std:cerr
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
 
-  std::map<std::string_view, CommandFunction> commands = {
-      {"exit", [&](const auto &args) { std::exit(0); }},
-      {"echo",
-       [&](const auto &args) {
-         for (size_t i = 0; i < args.size(); ++i) {
-           std::cout << args[i] << " ";
-         }
-         std::cout << std::endl;
-       }},
-      {
-          "type",
-          [&](const auto &args) {
-            if (args.size() != 2)
-              return;
-            if (builtin_commands.contains(args[1])) {
-              std::cout << args[1] << " is a shell builtin\n";
-            } else {
-              std::cout << args[1] << ": not found\n";
-            }
-          },
-      }};
+    const auto command_controller = command{};
 
-  while (true) {
-    std::cout << "$ ";
+    while (true) {
+        std::cout << "$ ";
 
-    std::string line;
-    std::getline(std::cin, line);
+        std::string line;
+        std::getline(std::cin, line);
 
-    auto tokens = std::string_view{line} | std::ranges::views::split(' ') |
-                  std::ranges::views::transform([](auto &&subrange) {
-                    return std::string_view{subrange.begin(), subrange.end()};
-                  });
+        auto tokens = sv{line} | std::views::split(' ') |
+                      std::views::filter([](auto &&subrange) { return !subrange.empty(); }) |
+                      std::views::transform([](auto &&subrange) {
+                          return sv{&*subrange.begin(), static_cast<std::size_t>(std::ranges::distance(subrange))};
+                      });
 
-    auto it = tokens.begin();
-    if (it == tokens.end())
-      continue;
+        auto       it  = tokens.begin();
+        const auto cmd = sv{*it++};
 
-    auto cmd = *it;
-    if (cmd.empty()) {
-      do {
-        ++it;
-        if (it == tokens.end())
-          continue;
-      } while ((cmd = *it).empty());
+        auto args = std::ranges::to<std::vector<sv>>(std::ranges::subrange(it, tokens.end()));
+
+        if (!command_controller.builtin_commands().contains(cmd)) {
+            std::cout << cmd << ": command not found\n";
+        }
+
+        command_controller.execute(cmd, args);
+
+        // if (cmd == "exit")
+        //     break;
+        // else if (cmd == "echo") {
+        //     for (++it; it != tokens.end(); ++it) {
+        //         std::cout << *it << " ";
+        //     }
+        //     std::cout << std::endl;
+        // } else if (cmd == "type") {
+        //     if (builtin_commands.contains(*++it)) {
+        //         std::cout << *it << " is a shell builtin\n";
+        //     } else {
+        //         std::cout << *it << ": not found\n";
+        //     }
+        // } else {
+        // }
     }
 
-    if (cmd == "exit")
-      break;
-    else if (cmd == "echo") {
-      for (++it; it != tokens.end(); ++it) {
-        std::cout << *it << " ";
-      }
-      std::cout << std::endl;
-    } else if (cmd == "type") {
-      if (std::find(builtin_commands.begin(), builtin_commands.end(), *++it) !=
-          builtin_commands.end()) {
-        std::cout << *it << " is a shell builtin\n";
-      } else {
-        std::cout << *it << ": not found\n";
-      }
-    } else {
-      std::cout << cmd << ": command not found\n";
-    }
-  }
-
-  return 0;
+    return 0;
 }
