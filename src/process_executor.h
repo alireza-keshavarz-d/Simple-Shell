@@ -12,7 +12,7 @@
 
 class ProcessExecutor {
 public:
-    int execute(const fs::path &executable, sv command, const std::span<const sv> &args) const;
+    int execute(const fs::path &executable, sv command, const std::span<const std::string> args) const;
 };
 
 

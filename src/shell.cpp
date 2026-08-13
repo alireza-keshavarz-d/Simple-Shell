@@ -3,10 +3,10 @@
 //
 
 #include "shell.h"
+#include "command_invocation.h"
 
 #include <iostream>
 
-#include "command_invocation.h"
 
 Shell::Shell(const sv path) : m_lexer{}, m_parser{}, m_resolver{path}, m_executor{}, m_context{m_resolver} {}
 
@@ -22,21 +22,21 @@ int Shell::run() {
         if (!std::getline(std::cin, line))
             break;
 
-        const auto tokens = m_lexer.lex(line, ' ');
+        const auto tokens = m_lexer.lex(line);
         if (tokens.empty())
             continue;
 
         const auto invocation = m_parser.parse(tokens);
         if (!invocation) continue;
 
-        const auto command = m_resolver.resolve(invocation.name());
+        const auto command = m_resolver.resolve(invocation->name());
 
         if (command.type == CommandType::NotFound) {
-            std::cout << invocation.name() << ": command not found\n";
+            std::cout << invocation->name() << ": command not found\n";
             continue;
         }
 
-        execute(command, invocation);
+        execute(command, *invocation);
     }
 
     return 0;

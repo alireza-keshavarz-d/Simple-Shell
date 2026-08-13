@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 int ProcessExecutor::execute(const fs::path &executable, sv command,
-                             const std::span<const sv> &args) const {
+                             const std::span<const std::string> args) const {
     const auto pid = fork();
 
     if (pid < 0) {

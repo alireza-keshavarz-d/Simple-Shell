@@ -14,14 +14,14 @@
 
 class ShellContext;
 
-using BuiltinFunction = std::function<void(ShellContext &, const std::span<const sv> &)>;
+using BuiltinFunction = std::function<void(ShellContext &, const std::span<const std::string>)>;
 
 class BuiltinRegistry {
 public:
     BuiltinRegistry();
 
     [[nodiscard]] bool contains(sv name) const;
-    void               execute(sv name, ShellContext &context, const std::span<const sv> &args) const;
+    void               execute(sv name, ShellContext &context, const std::span<const std::string> args) const;
 
 private:
     std::map<sv, BuiltinFunction> m_builtins;
