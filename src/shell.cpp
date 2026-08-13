@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "command_invocation.h"
+
 
 Shell::Shell(const sv path) : m_lexer{}, m_resolver{path}, m_executor{}, m_context{m_resolver} {}
 
@@ -25,29 +27,32 @@ int Shell::run() {
         if (tokens.empty())
             continue;
 
-        const auto command_name      = tokens.front();
-        const auto args     = std::vector<sv>{tokens.begin() + 1, tokens.end()};
-        const auto command = m_resolver.resolve(command_name);
+        CommandInvocation invocation {
+            tokens.front(),
+            std::span{tokens}.subspan(1)
+        };
+
+        const auto command = m_resolver.resolve(invocation.name());
 
         if (command.type == CommandType::NotFound) {
-            std::cout << command_name << ": command not found\n";
+            std::cout << invocation.name() << ": command not found\n";
             continue;
         }
 
-        execute(command, args);
+        execute(command, invocation);
     }
 
     return 0;
 }
 
-void Shell::execute(const ResolvedCommand &command, const std::vector<sv> &args) {
+void Shell::execute(const ResolvedCommand &command, const CommandInvocation &invocation) {
     if (command.type == CommandType::Builtin) {
-        m_resolver.builtins().execute(command.name, m_context, args);
+        m_resolver.builtins().execute(command.name, m_context, invocation.args());
         return;
     }
 
     if (command.type == CommandType::External) {
-        (void)m_executor.execute(*command.path, command.name, args);
+        (void)m_executor.execute(*command.path, command.name, invocation.args());
         return;
     }
 }

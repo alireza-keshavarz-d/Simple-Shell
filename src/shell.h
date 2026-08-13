@@ -4,6 +4,8 @@
 
 #ifndef SHELL_H
 #define SHELL_H
+
+#include "command_invocation.h"
 #include "command_resolver.h"
 #include "lexer.h"
 #include "process_executor.h"
@@ -18,7 +20,7 @@ public:
     int run();
 
 private:
-    void execute(const ResolvedCommand &command, const std::vector<sv> &args);
+    void execute(const ResolvedCommand &command, const CommandInvocation &invocation);
 
     Lexer           m_lexer;
     CommandResolver m_resolver;

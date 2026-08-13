@@ -13,6 +13,7 @@ add_executable(shell
         src/process_executor.cpp
         src/builtin_registry.cpp
         src/shell_context.cpp
+        src/command_invocation.cpp
 )
 
 target_link_libraries(shell PRIVATE readline)
