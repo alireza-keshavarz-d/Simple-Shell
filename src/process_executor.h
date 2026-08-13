@@ -5,13 +5,14 @@
 #ifndef PROCESS_EXECUTOR_H
 #define PROCESS_EXECUTOR_H
 
-#include <vector>
 #include "typedefs.h"
+
+#include <span>
 
 
 class ProcessExecutor {
 public:
-    int execute(const fs::path &executable, sv command, const std::vector<sv> &args) const;
+    int execute(const fs::path &executable, sv command, const std::span<const sv> &args) const;
 };
 
 

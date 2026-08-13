@@ -4,13 +4,14 @@
 
 #include "process_executor.h"
 
+#include <vector>
 #include <cstring>
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
 
 int ProcessExecutor::execute(const fs::path &executable, sv command,
-                             const std::vector<sv> &args) const {
+                             const std::span<const sv> &args) const {
     const auto pid = fork();
 
     if (pid < 0) {

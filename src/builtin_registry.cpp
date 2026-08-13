@@ -38,7 +38,7 @@ BuiltinRegistry::BuiltinRegistry() {
 bool BuiltinRegistry::contains(const sv name) const { return m_builtins.contains(name); }
 
 void BuiltinRegistry::execute(const sv name, ShellContext &context,
-                              const std::vector<sv> &args) const {
+                              const std::span<const sv> &args) const {
     const auto it = m_builtins.find(name);
     if (it == m_builtins.end())
         throw std::runtime_error("Unknown builtin type");
