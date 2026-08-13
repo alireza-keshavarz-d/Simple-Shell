@@ -42,7 +42,7 @@ BuiltinRegistry::BuiltinRegistry() {
 
     m_builtins.emplace("cd", [](ShellContext &context, const auto& args) {
         auto path = std::string{};
-        if (args.empty()) {
+        if (args.empty() || args[0] == "~") {
             const char* home = std::getenv("HOME");
             if (home == nullptr) {
                 std::cerr << "cd: HOME not set\n";
