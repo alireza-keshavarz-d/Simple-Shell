@@ -23,6 +23,11 @@ std::vector<Token> Lexer::lex(const sv input) const {
 
         while (pos < input.size()) {
             const char c = input[pos];
+            if (c == '\\') {
+                ++pos;
+                token += input[pos++];
+                continue;
+            }
             if (c == '\'' && !in_double_quote) {
                 in_single_quote = !in_single_quote;
                 ++pos;
