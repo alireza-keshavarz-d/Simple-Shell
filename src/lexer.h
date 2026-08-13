@@ -5,10 +5,11 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include "typedefs.h"
+
 #include <string_view>
 #include <vector>
 
-using sv = std::string_view;
 
 class Lexer {
 public:

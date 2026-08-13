@@ -1,5 +1,6 @@
 #include "cmd.h"
 #include "lexer.h"
+#include "typedefs.h"
 
 #include <filesystem>
 #include <iostream>
@@ -7,8 +8,6 @@
 #include <string>
 #include <string_view>
 
-
-namespace fs = std::filesystem;
 
 int main() {
     // Flush after every std::cout / std:cerr

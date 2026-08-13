@@ -5,15 +5,11 @@
 #ifndef SHELL_STARTER_CPP_COMMAND_RESOLVER_H
 #define SHELL_STARTER_CPP_COMMAND_RESOLVER_H
 
+#include "typedefs.h"
 
 #include <filesystem>
-#include <map>
-#include <set>
 #include <string>
 
-
-using sv = std::string_view;
-namespace fs = std::filesystem;
 
 enum class command_type {
     Builtin,
