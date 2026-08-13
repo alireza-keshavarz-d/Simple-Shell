@@ -9,16 +9,13 @@
 
 TEST_CASE("command invocation exposes command and arguments")
 {
-    const std::vector<sv> tokens{
+    const std::vector<std::string> tokens{
         "echo",
         "hello",
         "world"
     };
 
-    const CommandInvocation invocation{
-        tokens.front(),
-        std::span{tokens}.subspan(1)
-    };
+    const CommandInvocation invocation{tokens};
 
     REQUIRE(invocation.name() == "echo");
 

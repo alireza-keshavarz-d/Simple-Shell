@@ -3,15 +3,15 @@
 //
 
 #include "command_invocation.h"
-CommandInvocation::CommandInvocation(sv name, std::span<const sv> args)
-    : m_name(name), m_args(args)
+
+CommandInvocation::CommandInvocation(std::vector<std::string> tokens)
+    : m_tokens(std::move(tokens))
 {}
 
 sv CommandInvocation::name() const noexcept {
-    return m_name;
+    return m_tokens.front();
 }
 
-std::span<const sv> CommandInvocation::args() const noexcept {
-    return m_args;
+std::span<const std::string> CommandInvocation::args() const noexcept {
+    return std::span{m_tokens}.subspan(1);
 }
-

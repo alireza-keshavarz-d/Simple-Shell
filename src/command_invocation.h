@@ -4,19 +4,20 @@
 
 #ifndef COMMAND_INVOCATION_H
 #define COMMAND_INVOCATION_H
+
 #include "typedefs.h"
+#include <vector>
 
 
 class CommandInvocation {
 public:
-    CommandInvocation(sv name, std::span<const sv> args);
+    explicit CommandInvocation(std::vector<std::string> tokens);
 
     [[nodiscard]] sv name() const noexcept;
-    [[nodiscard]] std::span<const sv> args() const noexcept;
+    [[nodiscard]] std::span<const std::string> args() const noexcept;
 
 private:
-    sv m_name;
-    std::span<const sv> m_args;
+    std::vector<std::string> m_tokens;
 };
 
 
