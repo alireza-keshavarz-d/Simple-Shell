@@ -8,8 +8,7 @@
 
 #include "command_invocation.h"
 
-
-Shell::Shell(const sv path) : m_lexer{}, m_resolver{path}, m_executor{}, m_context{m_resolver} {}
+Shell::Shell(const sv path) : m_lexer{}, m_parser{}, m_resolver{path}, m_executor{}, m_context{m_resolver} {}
 
 int Shell::run() {
     // Flush after every std::cout / std:cerr
@@ -27,10 +26,8 @@ int Shell::run() {
         if (tokens.empty())
             continue;
 
-        CommandInvocation invocation {
-            tokens.front(),
-            std::span{tokens}.subspan(1)
-        };
+        const auto invocation = m_parser.parse(tokens);
+        if (!invocation) continue;
 
         const auto command = m_resolver.resolve(invocation.name());
 

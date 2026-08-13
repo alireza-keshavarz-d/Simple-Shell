@@ -8,6 +8,7 @@
 #include "command_invocation.h"
 #include "command_resolver.h"
 #include "lexer.h"
+#include "parser.h"
 #include "process_executor.h"
 #include "shell_context.h"
 #include "typedefs.h"
@@ -23,6 +24,7 @@ private:
     void execute(const ResolvedCommand &command, const CommandInvocation &invocation);
 
     Lexer           m_lexer;
+    Parser          m_parser;
     CommandResolver m_resolver;
     ProcessExecutor m_executor;
     ShellContext    m_context;
