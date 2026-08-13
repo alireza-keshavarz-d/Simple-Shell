@@ -37,6 +37,15 @@ BuiltinRegistry::BuiltinRegistry() {
     m_builtins.emplace("pwd", [](const ShellContext &context, const auto& args) {
         std::cout << context.current_working_directory.c_str() << "\n";
     });
+
+    m_builtins.emplace("cd", [](ShellContext &context, const auto& args) {
+        const auto path = fs::path{args[0]};
+        if (fs::is_directory(path)) {
+           context.current_working_directory = path;
+        } else {
+            std::cout << "cd: " << path.string() << ": No such file or directory\n";
+        }
+    });
 }
 
 bool BuiltinRegistry::contains(const sv name) const { return m_builtins.contains(name); }
