@@ -5,13 +5,52 @@
 #include <vector>
 
 
-std::vector<sv> Lexer::lex(std::string_view input, char delimiter) const {
-    auto tokens = input | std::views::split(delimiter) |
-                  std::views::filter([](auto &&subrange) { return !subrange.empty(); }) |
-                  std::views::transform([](auto &&subrange) {
-                      return sv{&*subrange.begin(),
-                                static_cast<std::size_t>(std::ranges::distance(subrange))};
-                  });
+std::vector<Token> Lexer::lex(const sv input) const {
+    std::vector<Token> tokens;
+    std::size_t pos = 0;
 
-    return std::ranges::to<std::vector<sv>>(tokens);
+    while (pos < input.size()) {
+        // whitespace
+        while (pos < input.size() && std::isspace(static_cast<unsigned char>(input[pos]))) {
+            ++pos;
+        }
+
+        if (pos == input.size()) break;
+
+        auto token = std::string{};
+        bool in_single_quote = false;
+        bool in_double_quote = false;
+
+        while (pos < input.size()) {
+            const char c = input[pos];
+            if (c == '\'' && !in_double_quote) {
+                in_single_quote = !in_single_quote;
+                ++pos;
+                continue;
+            }
+
+            if (c == '"' && !in_single_quote) {
+                in_double_quote = !in_double_quote;
+                ++pos;
+                continue;
+            }
+
+            if (
+                std::isspace(static_cast<unsigned char>(c)) &&
+                    !in_single_quote &&
+                    !in_double_quote
+            ) break;
+
+            token += c;
+            ++pos;
+        }
+
+        if (in_single_quote || in_double_quote) {
+            throw std::runtime_error("unterminated quote");
+        }
+
+        tokens.emplace_back(TokenType::Word, token);
+    }
+
+    return tokens;
 }

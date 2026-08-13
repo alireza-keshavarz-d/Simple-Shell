@@ -6,14 +6,14 @@
 #define LEXER_H
 
 #include "typedefs.h"
+#include "token.h"
 
-#include <string_view>
 #include <vector>
 
 
 class Lexer {
 public:
-    [[nodiscard]] std::vector<sv> lex(std::string_view input, char delimiter) const;
+    [[nodiscard]] std::vector<Token> lex(sv input) const;
 };
 
 #endif // LEXER_H
