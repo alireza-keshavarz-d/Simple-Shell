@@ -8,6 +8,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-using sv = std::string_view;
+using sv     = std::string_view;
 
 #endif // TYPEDEFS_H

@@ -20,15 +20,15 @@ int ProcessExecutor::execute(const fs::path &executable, sv command,
 
     if (pid == 0) {
         // build argv
-        std::vector<char*> argv;
-        argv.reserve(1 + args.size() + 1);  // executable args nullptr
+        std::vector<char *> argv;
+        argv.reserve(1 + args.size() + 1); // executable args nullptr
 
         // argv[0] := executable name
-        argv.push_back(const_cast<char*>(command.data()));
+        argv.push_back(const_cast<char *>(command.data()));
 
         // args...
         for (const auto arg : args) {
-            argv.push_back(const_cast<char*>(arg.data()));
+            argv.push_back(const_cast<char *>(arg.data()));
         }
 
         // for `execv()`
