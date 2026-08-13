@@ -9,30 +9,30 @@
 
 TEST_CASE("Lexer split words") {
     const Lexer lexer;
-    const auto tokens = lexer.lex("echo hello world", ' ');
+    const auto tokens = lexer.lex("echo hello world");
     REQUIRE(tokens.size() == 3);
-    REQUIRE(tokens[0] == "echo");
-    REQUIRE(tokens[1] == "hello");
-    REQUIRE(tokens[2] == "world");
+    REQUIRE(tokens[0].value() == "echo");
+    REQUIRE(tokens[1].value() == "hello");
+    REQUIRE(tokens[2].value() == "world");
 }
 
 TEST_CASE("Lexer ignores repeated spaces") {
     const Lexer lexer;
-    const auto tokens = lexer.lex("echo   hello   world", ' ');
+    const auto tokens = lexer.lex("echo   hello   world");
     REQUIRE(tokens.size() == 3);
-    REQUIRE(tokens[0] == "echo");
-    REQUIRE(tokens[1] == "hello");
-    REQUIRE(tokens[2] == "world");
+    REQUIRE(tokens[0].value() == "echo");
+    REQUIRE(tokens[1].value() == "hello");
+    REQUIRE(tokens[2].value() == "world");
 }
 
 TEST_CASE("Lexer handles empty") {
     const Lexer lexer;
-    const auto tokens = lexer.lex("", ' ');
+    const auto tokens = lexer.lex("");
     REQUIRE(tokens.empty());
 }
 
 TEST_CASE("Lexer handles whitespace-only input") {
     const Lexer lexer;
-    const auto tokens = lexer.lex("     ", ' ');
+    const auto tokens = lexer.lex("     ");
     REQUIRE(tokens.empty());
 }
