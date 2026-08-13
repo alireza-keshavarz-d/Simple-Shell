@@ -7,6 +7,8 @@
 #include "shell_context.h"
 
 #include <iostream>
+#include <ranges>
+#include <unistd.h>
 
 
 BuiltinRegistry::BuiltinRegistry() {
@@ -39,12 +41,25 @@ BuiltinRegistry::BuiltinRegistry() {
     });
 
     m_builtins.emplace("cd", [](ShellContext &context, const auto& args) {
-        const auto path = fs::path{args[0]};
-        if (fs::is_directory(path)) {
-           context.current_working_directory = path;
+        auto path = std::string{};
+        if (args.empty()) {
+            const char* home = std::getenv("HOME");
+            if (home == nullptr) {
+                std::cerr << "cd: HOME not set\n";
+                return;
+            }
+            path = home;
         } else {
-            std::cout << "cd: " << path.string() << ": No such file or directory\n";
+            path = args[0];
         }
+
+        if (::chdir(path.c_str()) != 0) {
+            std::cout << "cd: " << path << ": No such file or directory\n";
+            return;
+        }
+
+        context.current_working_directory = fs::current_path();
+
     });
 }
 
