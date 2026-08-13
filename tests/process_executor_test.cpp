@@ -17,7 +17,7 @@ TEST_CASE("ProcessExecutor passes argv correctly", "[process]") {
 
     const fs::path executable = "./test_argv_helper";
 
-    const std::string input = "test_argv Alice Alice";
+    const std::string input = "test_argv Alice Alice David";
 
     // These are intentionally views into the same larger string.
     const std::string_view command{
@@ -27,7 +27,7 @@ TEST_CASE("ProcessExecutor passes argv correctly", "[process]") {
 
     const std::string_view arg{
         input.data() + command.size() + 1,
-        std::string_view{"Alice"}.size()
+        std::string_view{"Alice Alice David"}.size()
     };
 
     const std::array<std::string_view, 1> args{arg};
