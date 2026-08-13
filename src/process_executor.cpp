@@ -30,7 +30,7 @@ int ProcessExecutor::execute(const fs::path &executable, sv command,
 
         // args...
         for (const auto arg : args) {
-            argv.push_back(const_cast<char *>(arg.data()));
+            argv.push_back(const_cast<char *>(std::string{arg}.data()));
         }
 
         // for `execv()`
