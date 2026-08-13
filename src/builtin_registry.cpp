@@ -33,6 +33,10 @@ BuiltinRegistry::BuiltinRegistry() {
                 break;
         }
     });
+
+    m_builtins.emplace("pwd", [](const ShellContext &context, const auto& args) {
+        std::cout << context.current_working_directory.c_str() << "\n";
+    });
 }
 
 bool BuiltinRegistry::contains(const sv name) const { return m_builtins.contains(name); }
