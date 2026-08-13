@@ -9,6 +9,7 @@ add_executable(shell
         src/process_executor.cpp
         src/lexer.cpp
         src/cmd.cpp
+        src/executable_resolver.cpp
 )
 
 target_link_libraries(shell PRIVATE readline)

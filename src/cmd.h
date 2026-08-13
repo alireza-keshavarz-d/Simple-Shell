@@ -1,17 +1,17 @@
 #ifndef CMD_H
 #define CMD_H
 
+#include "command_resolver.h"
+#include "common.h"
+#include "executable_resolver.h"
+#include "typedefs.h"
+
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <map>
-#include <set>
 #include <string_view>
 #include <vector>
-
-#include "common.h"
-#include "command_resolver.h"
-#include "typedefs.h"
 
 
 class Command {
@@ -23,12 +23,9 @@ public:
     void execute(const command &cmd, const std::vector<sv> &args) const;
 
 private:
-    [[nodiscard]] std::vector<sv>                 parse_path_entries() const;
-    [[nodiscard]] std::map<std::string, fs::path> parse_execs_in_path() const;
+    ExecutableResolver m_executable_resolver;
 
-    const std::string_view          m_PATH = std::getenv("PATH");
-    std::vector<sv>                 m_paths;
-    std::map<std::string, fs::path> m_path_execs; // exec : path
+    std::vector<sv> m_paths;
 
     std::map<sv, CommandFunction> m_builtin_commands{
         {"exit", [&](const auto &args) { std::exit(0); }},
@@ -39,23 +36,25 @@ private:
              }
              std::cout << std::endl;
          }},
-        {
-            "type",
-            [&](const std::vector<sv> &args) {
-                if (args.empty())
-                    return;
-                if (const auto it = m_builtin_commands.find(std::string{args[0]});
-                    it != m_builtin_commands.end()
-                ) {
-                    std::cout << args[0] << " is a shell builtin\n";
-                } else if (m_path_execs.contains(std::string{args[0]})) {
-                    std::cout << args[0] << " is " << m_path_execs[std::string{args[0]}].c_str()
-                              << "\n";
-                } else {
-                    std::cout << args[0] << ": not found\n";
-                }
-            },
-        }};
+        {"type",
+         [&](const std::vector<sv> &args) {
+             if (args.empty())
+                 return;
+
+             const auto [type, name, path] = resolve(args[0]);
+             switch (type) {
+                 case command_type::Builtin:
+                     std::cout << name << " is shell a builtin\n";
+                     break;
+                 case command_type::External:
+                     std::cout << name << " is " << path->c_str() << "\n";
+                     break;
+                 case command_type::NotFound:
+                     std::cout << name << " not found\n";
+                     break;
+             }
+         }},
+    };
 };
 
 #endif // CMD_H
