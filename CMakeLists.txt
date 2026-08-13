@@ -21,14 +21,20 @@ target_link_libraries(shell PRIVATE readline)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     find_package(Catch2 REQUIRED)
+
+    add_executable(test_argv_helper
+            tests/test_argv_helper.cpp
+    )
     add_executable(shell_tests
             tests/lexer_test.cpp
             tests/executable_resolver_test.cpp
             tests/command_invocation.cpp
+            tests/process_executor_test.cpp
 
             src/lexer.cpp
             src/executable_resolver.cpp
             src/command_invocation.cpp
+            src/process_executor.cpp
     )
     target_include_directories(shell_tests
         PRIVATE
