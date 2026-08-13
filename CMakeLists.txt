@@ -10,6 +10,9 @@ add_executable(shell
         src/lexer.cpp
         src/cmd.cpp
         src/executable_resolver.cpp
+        src/builtin_registry.cpp
+        src/shell_context.cpp
+        src/command_resolver.cpp
 )
 
 target_link_libraries(shell PRIVATE readline)

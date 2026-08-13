@@ -2,25 +2,28 @@
 // Created by ka on 8/12/26.
 //
 
-#ifndef SHELL_STARTER_CPP_COMMAND_RESOLVER_H
-#define SHELL_STARTER_CPP_COMMAND_RESOLVER_H
+#ifndef COMMAND_RESOLVER_H
+#define COMMAND_RESOLVER_H
 
+#include "builtin_registry.h"
+#include "command_resolver_result.h"
+#include "executable_resolver.h"
 #include "typedefs.h"
 
-#include <filesystem>
-#include <string>
+class BuiltinRegistry;
+class ExecutableResolver;
 
+class CommandResolver {
+public:
+    explicit CommandResolver(sv path);
 
-enum class command_type {
-    Builtin,
-    External,
-    NotFound,
+    [[nodiscard]] ResolvedCommand resolve(sv command) const;
+    [[nodiscard]] BuiltinRegistry builtins() const;
+
+private:
+    BuiltinRegistry    m_builtins;
+    ExecutableResolver m_executables;
 };
 
-struct command {
-    command_type type;
-    sv name;
-    std::optional<fs::path> path;
-};
 
-#endif // SHELL_STARTER_CPP_COMMAND_RESOLVER_H
+#endif // COMMAND_RESOLVER_H
