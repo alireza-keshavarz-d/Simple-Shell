@@ -8,12 +8,12 @@ add_executable(shell
         src/main.cpp
         src/shell.cpp
         src/lexer.cpp
+        src/parser.cpp
         src/command_resolver.cpp
         src/executable_resolver.cpp
         src/process_executor.cpp
         src/builtin_registry.cpp
         src/shell_context.cpp
-        src/command_invocation.cpp
 )
 
 target_link_libraries(shell PRIVATE readline)
@@ -29,9 +29,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             tests/lexer_test.cpp
             tests/executable_resolver_test.cpp
             tests/command_invocation.cpp
-            tests/process_executor_test.cpp
+            tests/parser_test.cpp
 
             src/lexer.cpp
+            src/parser.cpp
             src/executable_resolver.cpp
             src/command_invocation.cpp
             src/process_executor.cpp
