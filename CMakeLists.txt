@@ -6,13 +6,13 @@ set(CMAKE_CXX_STANDARD 23) # Enable the C++23 standard
 
 add_executable(shell
         src/main.cpp
-        src/process_executor.cpp
+        src/shell.cpp
         src/lexer.cpp
-        src/cmd.cpp
+        src/command_resolver.cpp
         src/executable_resolver.cpp
+        src/process_executor.cpp
         src/builtin_registry.cpp
         src/shell_context.cpp
-        src/command_resolver.cpp
 )
 
 target_link_libraries(shell PRIVATE readline)
