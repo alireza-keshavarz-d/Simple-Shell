@@ -16,3 +16,24 @@ add_executable(shell
 )
 
 target_link_libraries(shell PRIVATE readline)
+
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_package(Catch2 REQUIRED)
+    add_executable(shell_tests
+            tests/lexer_test.cpp
+            tests/executable_resolver_test.cpp
+
+            src/lexer.cpp
+            src/executable_resolver.cpp
+    )
+    target_include_directories(shell_tests
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    )
+
+    target_link_libraries(shell_tests
+        PRIVATE
+            Catch2::Catch2WithMain
+    )
+endif ()
