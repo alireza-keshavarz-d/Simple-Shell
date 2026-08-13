@@ -19,18 +19,29 @@ int ProcessExecutor::execute(const fs::path &executable, sv command,
         return -1;
     }
 
+
+    const auto data = args.data();
+
     if (pid == 0) {
         // build argv
         std::vector<char *> argv;
         argv.reserve(1 + args.size() + 1); // executable args nullptr
 
         // argv[0] := executable name
-        argv.push_back(const_cast<char *>(command.data()));
+        const auto command_name = std::string(command);
+        argv.push_back(const_cast<char *>(command_name.data()));
 
         // args...
         for (const auto arg : args) {
             argv.push_back(const_cast<char *>(arg.data()));
         }
+
+        // std::cout << executable.string() << std::endl;
+        for (const auto arg : argv) {
+            std::cout << arg << " - ";
+        }
+        std::cout << std::endl;
+
 
         // for `execv()`
         argv.push_back(nullptr);
