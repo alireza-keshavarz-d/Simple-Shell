@@ -9,7 +9,11 @@
 #include <string>
 
 enum class TokenType {
-    Word
+    Word,
+    Pipe,
+    RedirectInput,
+    RedirectOutput,
+    RedirectAppend
 };
 
 class Token {

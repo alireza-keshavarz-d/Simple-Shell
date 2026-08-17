@@ -6,15 +6,18 @@
 #define PARSER_H
 
 
-#include "token.h"
+#include "command_ast.h"
+#include "parse_error.h"
 #include "command_invocation.h"
+#include "token.h"
 
-#include <optional>
+#include <expected>
+
 
 
 class Parser {
 public:
-    [[nodiscard]] std::optional<CommandInvocation>
+    [[nodiscard]] std::expected<Pipeline, ParseError>
     parse(const std::vector<Token> &tokens) const;
 };
 
