@@ -10,7 +10,6 @@ add_executable(shell
         src/lexer.cpp
         src/parser.cpp
         src/command_resolver.cpp
-        src/command_invocation.cpp
         src/executable_resolver.cpp
         src/process_executor.cpp
         src/builtin_registry.cpp
@@ -29,13 +28,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(shell_tests
             tests/lexer_test.cpp
             tests/executable_resolver_test.cpp
-            tests/command_invocation.cpp
             tests/parser_test.cpp
 
             src/lexer.cpp
             src/parser.cpp
             src/executable_resolver.cpp
-            src/command_invocation.cpp
     )
     target_include_directories(shell_tests
         PRIVATE
