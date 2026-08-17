@@ -4,6 +4,31 @@
 #include <string_view>
 #include <vector>
 
+namespace {
+bool is_operator(char c) {
+    return c == '|' || c == '>' || c == '<';
+}
+
+TokenType operator_type(const sv input, std::size_t& index) {
+    switch (input[index]) {
+    case '|':   // |
+        ++index;
+        return TokenType::Pipe;
+    case '<':   // <
+        ++index;
+        return TokenType::RedirectInput;
+    case '>':
+        if (index + 1 < input.size() && input[index+1] == '>') { // >>
+            index += 2;
+            return TokenType::RedirectAppend;
+        }
+        // >
+        ++index;
+        return TokenType::RedirectOutput;
+    }
+    throw std::logic_error("not at operator");
+}
+}
 
 std::vector<Token> Lexer::lex(const sv input) const {
     std::vector<Token> tokens;
@@ -23,6 +48,22 @@ std::vector<Token> Lexer::lex(const sv input) const {
 
         while (pos < input.size()) {
             const char c = input[pos];
+
+            if (!in_single_quote && !in_double_quote && is_operator(c)) {
+                if (!token.empty()) break;
+
+                const auto begin = pos;
+                const auto type = operator_type(input, pos);
+                tokens.emplace_back(type, std::string{input.substr(begin, pos - begin)});
+                continue;
+            }
+
+            if (
+                (std::isspace(static_cast<unsigned char>(c)) || is_operator(c)) &&
+                    !in_single_quote &&
+                    !in_double_quote
+            ) break;
+
             if (c == '\\' && !in_single_quote) {
                 ++pos;
                 token += input[pos++];
@@ -40,12 +81,6 @@ std::vector<Token> Lexer::lex(const sv input) const {
                 continue;
             }
 
-            if (
-                std::isspace(static_cast<unsigned char>(c)) &&
-                    !in_single_quote &&
-                    !in_double_quote
-            ) break;
-
             token += c;
             ++pos;
         }
@@ -54,7 +89,8 @@ std::vector<Token> Lexer::lex(const sv input) const {
             throw std::runtime_error("unterminated quote");
         }
 
-        tokens.emplace_back(TokenType::Word, token);
+        if (!token.empty())
+            tokens.emplace_back(TokenType::Word, token);
     }
 
     return tokens;
